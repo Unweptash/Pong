@@ -1,0 +1,224 @@
+from datetime import datetime
+#scores
+left_score = 0
+right_score = 0
+
+#powerups position
+powerup1_x = 390
+powerup1_y = 270
+powerup2_x = 390
+powerup2_y = 270
+
+#powerups velocity
+powerup1_dx = 2
+#powerup1_dy = 2
+powerup1_dy = 0
+powerup2_dx = -2
+powerup2_dy = -2
+
+#paddle positions
+left_y = 260
+right_y = 260
+leftp_y = 260 
+rightp_y = 260
+leftp_x = 1000
+rightp_x = 1000
+
+#ball position
+ball_x = 390
+ball_y = 290
+
+#ball velocity/direction
+#ball_dy = -2
+ball_dy = 0
+ball_dx = -2
+
+#fixing the keyboard issues
+left_key = ""
+right_key = ""
+
+def powerup_reset():
+    global powerup1_x, powerup1_y, leftp_x
+    powerup1_x = 390
+    powerup1_y = 290
+    leftp_x = -100
+    
+    now = datetime.now()
+    list = []
+    list.append(now.second)
+    if now.second - list[0] == 3:
+        print(now.second)
+        powerup_reset()
+
+def reset_game():
+    global left_score, right_score, left_y, right_y, ball_x, ball_y, ball_dy, ball_dx
+    #scores
+    left_score = 0
+    right_score = 0
+
+    #paddle positions
+    left_y = 260
+    right_y = 260
+
+    #ball position
+    ball_x = 390
+    ball_y = 290
+
+    #ball velocity/direction
+    ball_dy = -2
+    ball_dx = -2
+
+
+def ball_reset():
+    #ball position 
+    global ball_x, ball_y
+    ball_x = 390
+    ball_y = 290
+
+def setup():
+    size(800,600)
+    
+def draw():
+    global leftp_x, rightp_x, leftp_y, rightp_y, powerup1, powerup1_dx, powerup1_dy, powerup2_dx, powerup2_dy, powerup1_x, powerup1_y, powerup2_x, powerup2_y, ball_x, ball_y, ball_dy, ball_dx, left_score, right_score, left_y, right_y 
+    
+    background(0)
+    
+        ##############
+        #update 
+    #move left paddle
+    if left_key == "w":
+        left_y += -2
+    if left_key == "s":
+        left_y += 2  
+        
+    #move right paddle
+    if right_key == "i":
+        right_y += -2
+    if right_key == "k":
+        right_y += 2  
+
+    #moving powerups
+    powerup1_x += powerup1_dx
+    powerup1_y += powerup1_dy
+    powerup2_x += powerup2_dx
+    powerup2_y += powerup2_dy
+
+    #moving ball    
+    ball_x = ball_x + ball_dx
+    ball_y = ball_y + ball_dy
+        
+        #bounce off bottom/top screen
+    if ball_y > 580 or ball_y < 0:
+        ball_dy = ball_dy * -1
+        
+        #bounce off bottom/top screen
+    if powerup1_y >= 560 or powerup1_y <= 0:
+        powerup1_dy = powerup1_dy * -1
+    if powerup2_y >= 560 or powerup2_y <= 0:
+        powerup2_dy = powerup2_dy * -1
+        
+        #bounce in yellow rectangle
+    if powerup1_x >= 560 or powerup1_x <= 200:
+        powerup1_dx = powerup1_dx * -1
+    if powerup2_x >= 560 or powerup2_x <= 200:
+        powerup2_dx = powerup2_dx * -1
+       
+        
+        #scoring
+        #going off left or right edge of screen
+        #check right edge/left point
+    if ball_x > 780:
+        left_score += 1
+        ball_reset()
+            
+        #check left edge/right point
+    elif ball_x < 0:
+        right_score += 1
+        ball_reset()
+        
+        #left paddle bounce    
+    if ball_x <= 40 and ball_y > left_y and ball_y < (left_y + 80):
+         ball_dx = ball_dx * -1
+         #left powerup1 paddle bounce
+  #  if ball_x <= 40 and ball_y > leftp_y and ball_y < (leftp_y + 80):
+   #      ball_dx = ball_dx * -1
+        #right paddle bounce
+    if ball_x >= 750 and ball_y > right_y and ball_y < (right_y + 80):
+        ball_dx = ball_dx * -1
+        #right powerup1 paddle bounce
+  #  if ball_x <= 750 and ball_y > rightp_y and ball_y < (rightp_y + 80):
+   #      ball_dx = ball_dx * -1
+
+ 
+    if powerup1_x - ball_x <= 1 and powerup1_y - ball_y <= 1:
+        if ball_dx > 0:
+            leftp_x = 30
+        elif ball_dx < 0:
+            rightp_x = 770
+        powerup1_x = 1000
+            
+
+
+        
+        ##############
+        #DRAW SCREEN
+        
+    text("PONG", 350,40)
+    text(left_score, 40, 40)
+    text(right_score, 760, 40)
+    
+        
+    #powerup area
+    fill(255,215,0)
+    rect(200, 0, 400, 600)
+        #Powerups
+    fill(255, 0,  0)
+    powerup1 = rect(powerup1_x, powerup1_y,40,40)
+    fill(0, 0, 255)
+    powerup2 = rect(powerup2_x, powerup2_y,40,40)
+        
+        #paddles
+    fill(255, 255, 255)
+    rect(30,left_y,10,80) #left paddle
+    fill(255, 255, 255)
+    rect(770,right_y,10,80) #right paddle
+    
+    #powerup1_paddle
+    fill(0, 128, 0)
+    rect(leftp_x,leftp_y,10,80) #left paddle
+    fill(0, 128, 0)
+    rect(rightp_x,rightp_y,10,80) #right paddle
+        
+        #ball
+    fill(255, 255, 255)
+    rect(ball_x,ball_y,20,20)
+    
+def keyReleased():
+    #helps smoothen paddle movement
+    if key == "w":
+        left_key = ""
+            
+    elif key == "s":
+        left_key = ""
+        
+    elif key == "i":
+        right_key = ""
+            
+    elif key == "k":
+        right_key = ""
+def keyPressed():
+    global left_y, right_y
+            
+    #left player w - up/s - down
+    if key == "w":
+        left_y = left_y - 10
+            
+    elif key == "s":
+        left_y = left_y + 10
+                
+    #right player i - up/k - down
+    elif key == "i":
+        right_y = right_y - 10
+            
+    elif key == "k":
+        right_y = right_y + 10
