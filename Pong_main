@@ -1,54 +1,83 @@
 from datetime import datetime
+import math as math
+from interactive_movement_paddles_functions import interactive_movement_paddles
+from resetting_functions import powerup1_reset
+from resetting_functions import powerup2_reset
+from resetting_functions import reset_game
+from resetting_functions import ball_reset
+
+
 #scores
 left_score = 0
 right_score = 0
 
+#last hit between powerup and ball
+last_hit1 = 0
+last_hit2 = 0
+
+#counting variable to prevent first auto-reset of powerup
+counter1 = 0
+counter2 = 0
+
 #powerups position
-powerup1_x = 390
+powerup1_x = 440
 powerup1_y = 270
-powerup2_x = 390
+powerup2_x = 440
 powerup2_y = 270
 
 #powerups velocity
 powerup1_dx = 2
-#powerup1_dy = 2
-powerup1_dy = 0
+powerup1_dy = 2
 powerup2_dx = -2
 powerup2_dy = -2
 
 #paddle positions
 left_y = 260
 right_y = 260
-leftp_y = 260 
-rightp_y = 260
 leftp_x = 1000
 rightp_x = 1000
+leftp_y = 260
+rightp_y = 260
+
+#paddle height dependent of powerup2
+powerup2left_height = 80
+powerup2right_height = 80
+
 
 #ball position
 ball_x = 390
 ball_y = 290
 
 #ball velocity/direction
-#ball_dy = -2
-ball_dy = 0
+ball_dy = -2
 ball_dx = -2
 
 #fixing the keyboard issues
 left_key = ""
 right_key = ""
 
-def powerup_reset():
-    global powerup1_x, powerup1_y, leftp_x
+def powerup1_reset():
+    global powerup1_x, powerup1_y, leftp_x, rightp_x
     powerup1_x = 390
     powerup1_y = 290
-    leftp_x = -100
+    leftp_x = -100   
+    rightp_x = -100
+
+def powerup2_reset():
+    global left_y, leftp_y, right_y, rightp_y, powerup2left_height, powerup2right_height, powerup2_x, powerup2_y
+    #paddle height dependent of powerup2
+    if powerup2left_height == 160:
+        left_y += 40        
+        leftp_y += 40
+        powerup2left_height = 80
+    elif powerup2right_height == 160:
+        right_y += 40
+        rightp_y += 40
+        powerup2right_height = 80
+    powerup2_x = 390
+    powerup2_y = 290
+
     
-    now = datetime.now()
-    list = []
-    list.append(now.second)
-    if now.second - list[0] == 3:
-        print(now.second)
-        powerup_reset()
 
 def reset_game():
     global left_score, right_score, left_y, right_y, ball_x, ball_y, ball_dy, ball_dx
@@ -61,7 +90,7 @@ def reset_game():
     right_y = 260
 
     #ball position
-    ball_x = 390
+    ball_x = 390 
     ball_y = 290
 
     #ball velocity/direction
@@ -79,23 +108,27 @@ def setup():
     size(800,600)
     
 def draw():
-    global leftp_x, rightp_x, leftp_y, rightp_y, powerup1, powerup1_dx, powerup1_dy, powerup2_dx, powerup2_dy, powerup1_x, powerup1_y, powerup2_x, powerup2_y, ball_x, ball_y, ball_dy, ball_dx, left_score, right_score, left_y, right_y 
+    global counter1, counter2, powerup2left_height, powerup2right_height, last_hit1, last_hit2, leftp_y, rightp_y, leftp_x, rightp_x, powerup1_dx, powerup1_dy, powerup2_dx, powerup2_dy, powerup1_x, powerup1_y, powerup2_x, powerup2_y, ball_x, ball_y, ball_dy, ball_dx, left_score, right_score, left_y, right_y 
     
     background(0)
     
         ##############
         #update 
-    #move left paddle
+    #moving paddles
+    #move left paddles
     if left_key == "w":
         left_y += -2
+        leftp_y += 2
     if left_key == "s":
         left_y += 2  
-        
-    #move right paddle
+        leftp_y += -2
+    #move right paddles
     if right_key == "i":
         right_y += -2
+        rightp_y += 2
     if right_key == "k":
         right_y += 2  
+        rightp_y += -2
 
     #moving powerups
     powerup1_x += powerup1_dx
@@ -137,28 +170,53 @@ def draw():
         ball_reset()
         
         #left paddle bounce    
-    if ball_x <= 40 and ball_y > left_y and ball_y < (left_y + 80):
-         ball_dx = ball_dx * -1
-         #left powerup1 paddle bounce
-  #  if ball_x <= 40 and ball_y > leftp_y and ball_y < (leftp_y + 80):
-   #      ball_dx = ball_dx * -1
+    if ball_x <= 40 and ball_y > left_y and ball_y < (left_y + powerup2left_height):
+        ball_dx = ball_dx * -1
+        # left powerup1 paddle bounce
+    elif ball_x <= 40 and ball_y > leftp_y and ball_y < (leftp_y + powerup2left_height):
+        ball_dx = ball_dx * -1
         #right paddle bounce
-    if ball_x >= 750 and ball_y > right_y and ball_y < (right_y + 80):
+    if ball_x >= 750 and ball_y > right_y and ball_y < (right_y + powerup2right_height):
         ball_dx = ball_dx * -1
         #right powerup1 paddle bounce
-  #  if ball_x <= 750 and ball_y > rightp_y and ball_y < (rightp_y + 80):
-   #      ball_dx = ball_dx * -1
+    elif ball_x >= 750 and ball_y > rightp_y and ball_y < (rightp_y + powerup2right_height):
+         ball_dx = ball_dx * -1
 
- 
-    if powerup1_x - ball_x <= 1 and powerup1_y - ball_y <= 1:
+    #collision powerup1 and ball
+    if abs(powerup1_x - ball_x) <= 30 and abs(powerup1_y - ball_y) <= 30:
         if ball_dx > 0:
             leftp_x = 30
         elif ball_dx < 0:
             rightp_x = 770
+        counter1 = 1
         powerup1_x = 1000
-            
+        last_hit1 = millis()
+        
+    #reset powerup1        
+    if 8000 < millis() - last_hit1 < 9000 and counter1 == 1:
+        last_hit1 = 0
+        powerup1_reset()
 
 
+    #collision powerup2
+    if abs(powerup2_x - ball_x) <= 30 and abs(powerup2_y - ball_y) <= 30:
+        if ball_dx > 0:
+            powerup2left_height = 160
+            left_y -= 40
+            leftp_y -= 40
+        elif ball_dx < 0:
+            powerup2right_height = 160
+            right_y -= 40
+            rightp_y -= 40
+        counter2 = 1
+        powerup2_x = 1000
+        last_hit2 = millis()
+
+    #reset powerup2        
+    if 8000 < millis() - last_hit2 < 9000 and counter2 == 1:
+        last_hit2 = 0
+        powerup2_reset()
+    
         
         ##############
         #DRAW SCREEN
@@ -171,6 +229,7 @@ def draw():
     #powerup area
     fill(255,215,0)
     rect(200, 0, 400, 600)
+    
         #Powerups
     fill(255, 0,  0)
     powerup1 = rect(powerup1_x, powerup1_y,40,40)
@@ -179,21 +238,44 @@ def draw():
         
         #paddles
     fill(255, 255, 255)
-    rect(30,left_y,10,80) #left paddle
+    rect(30,left_y,10,powerup2left_height) #left paddle
     fill(255, 255, 255)
-    rect(770,right_y,10,80) #right paddle
+    rect(770,right_y,10,powerup2right_height) #right paddle
     
     #powerup1_paddle
     fill(0, 128, 0)
-    rect(leftp_x,leftp_y,10,80) #left paddle
+    rect(leftp_x,leftp_y,10,powerup2left_height) #left paddle
     fill(0, 128, 0)
-    rect(rightp_x,rightp_y,10,80) #right paddle
-        
+    rect(rightp_x,rightp_y,10,powerup2right_height) #right paddle
+    
+
         #ball
     fill(255, 255, 255)
     rect(ball_x,ball_y,20,20)
     
+def keyPressed():
+    global left_y, right_y, leftp_y, rightp_y, leftq_top_y, leftq_bottom_y, rightq_top_y, rightq_bottom_y
+            
+    #left player w - up/s - down
+    if key == "w":
+        left_y = left_y - 10
+        leftp_y = leftp_y + 10
+            
+    elif key == "s":
+        left_y = left_y + 10
+        leftp_y = leftp_y - 10
+
+    #right player i - up/k - down
+    elif key == "i":
+        right_y = right_y - 10
+        rightp_y = rightp_y + 10
+
+    elif key == "k":
+        right_y = right_y + 10
+        rightp_y = rightp_y - 10
+
 def keyReleased():
+    global left_key, right_key
     #helps smoothen paddle movement
     if key == "w":
         left_key = ""
@@ -206,19 +288,4 @@ def keyReleased():
             
     elif key == "k":
         right_key = ""
-def keyPressed():
-    global left_y, right_y
-            
-    #left player w - up/s - down
-    if key == "w":
-        left_y = left_y - 10
-            
-    elif key == "s":
-        left_y = left_y + 10
-                
-    #right player i - up/k - down
-    elif key == "i":
-        right_y = right_y - 10
-            
-    elif key == "k":
-        right_y = right_y + 10
+
