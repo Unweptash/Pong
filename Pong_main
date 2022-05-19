@@ -2,8 +2,6 @@ import math as math
 from dictionaries import *
 from functions import *
 
-
-
 ###############################################################
 def setup():
     size(800,600)
@@ -13,61 +11,70 @@ def draw():
     global main
     background(0)
    
+    ball = main["ball"]
+    powerup1 = main["powerup1"]
+    powerup2 = main["powerup2"]
+    paddles = main["paddles"]
+    other = main["other"]
+   
     #holding down key resulting in smoother movement
-    continous_movement_paddles()
+    continous_movement_paddles(paddles)
    
     #powerup1, powerup2 and ball movement
-    auto_object_movements()
+    auto_object_movements(powerup1, powerup2, ball)
    
     #powerup1, powerup2 and ball boundaries in game
-    auto_object_area_boundaries()
+    auto_object_area_boundaries(ball, powerup1, powerup2)
 
     #score counter
-    score_counter()
+    score_counter(ball, other)
        
     #regular and powerup paddle bounce with ball    
-    paddle_ball_bounce()
+    paddle_ball_bounce(ball, paddles)
    
     #powerup and ball collisions
-    powerup_ball_collisions()
+    powerup_ball_collisions(powerup1, ball, paddles, other, powerup2)
 
     #powerup resets
-    powerup_resets()
+    powerup_resets(powerup1, powerup2, paddles)
               
         ##############
         #DRAW SCREEN
 
     #draws all objects
-    draw_screen()
+    draw_screen(other, powerup1, powerup2, paddles, ball)
+
+#######################################
+#keypressing functions
 
 def keyPressed():
     #left player w - up/s - down
     if key == "w":
-        main["paddles"]["left_y"] -= 10
-        main["paddles"]["leftp_y"] += 10
+        paddles["left_y"] -= 10
+        paddles["leftp_y"] += 10
            
     if key == "s":
-        main["paddles"]["left_y"] += 10
-        main["paddles"]["leftp_y"] -= 10
+        paddles["left_y"] += 10
+        paddles["leftp_y"] -= 10
 
     #right player i - up/k - down
     if key == "i":
-        main["paddles"]["right_y"] -= 10
-        main["paddles"]["rightp_y"] += 10
+        paddles["right_y"] -= 10
+        paddles["rightp_y"] += 10
 
     if key == "k":
-        main["paddles"]["right_y"] += 10
-        main["paddles"]["rightp_y"] -= 10
+        paddles["right_y"] += 10
+        paddles["rightp_y"] -= 10
 
 def keyReleased():
     if key == "w":
-        main["paddles"]["left_key"] = ""
+        paddles["left_key"] = ""
 
     if key == "s":
-        main["paddles"]["left_key"] = ""
+        paddles["left_key"] = ""
        
     if key == "i":
-        main["paddles"]["right_key"] = ""
+        paddles["right_key"] = ""
            
     if key == "k":
         main["paddles"]["right_key"] = ""
