@@ -2,6 +2,7 @@ import math as math
 from dictionaries import *
 from functions import *
 
+
 ###############################################################
 def setup():
     size(800,600)
@@ -36,16 +37,13 @@ def draw():
     powerup_ball_collisions(powerup1, ball, paddles, other, powerup2)
 
     #powerup resets
-    powerup_resets(powerup1, powerup2, paddles)
+    powerup_resets(powerup1, powerup2, paddles, other)
               
         ##############
         #DRAW SCREEN
 
     #draws all objects
     draw_screen(other, powerup1, powerup2, paddles, ball)
-
-#######################################
-#keypressing functions
 
 def keyPressed():
     #left player w - up/s - down
