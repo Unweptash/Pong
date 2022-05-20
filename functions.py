@@ -2,15 +2,15 @@ from dictionaries import *
 import math as math
 
 
-def powerup_resets(powerup1, powerup2, paddles):
+def powerup_resets(powerup1, powerup2, paddles, other):
     #reset powerup1        
-    if 8000 < millis() - main["other"]["last_hit1"] < 9000 and main["other"]["counter1"] == 1:
-        main["other"]["last_hit1"] = 0
+    if 8000 < millis() - other["last_hit1"] < 9000 and other["counter1"] == 1:
+        other["last_hit1"] = 0
         powerup1_reset(powerup1, paddles)
 
     #reset powerup2        
-    if 8000 < millis() - main["other"]["last_hit2"] < 9000 and main["other"]["counter2"] == 1:
-        main["other"]["last_hit2"] = 0
+    if 8000 < millis() - other["last_hit2"] < 9000 and other["counter2"] == 1:
+        other["last_hit2"] = 0
         powerup2_reset(powerup2, paddles)
 
 def powerup1_reset(powerup1, paddles):
